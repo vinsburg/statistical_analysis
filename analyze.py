@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import csv 
+import scipy.spatial.distance as distance
+from collections import defaultdict
 
 class Analyzer(object):
     
@@ -11,13 +13,12 @@ class Analyzer(object):
             for row in csv.reader(csv_file, dialect='excel'):
                 data.append(row)
         header = data.pop(0)
-        self.parsed_file["results"] = []
+        self.parsed_file["students"] = []
         # each student gets his own entry
         counter = 0
+        self.categorie_amount = 10
         for line in data:
-            counter += 1
-            print("counter: " + str(counter) + "line: " +  str(line[0:20]))
-            self.parsed_file["results"].append({
+            self.parsed_file["students"].append({
                         "rounds"            : [
                                 [ int(num) for num in line[0:20]  ],
                                 [ int(num) for num in line[20:40] ],
@@ -30,11 +31,12 @@ class Analyzer(object):
                 })
 
     def countCategoriesPerStudent(self, round_num=0):
-        students = len(self.parsed_file["results"])
-        inputs = [result["rounds"][round_num] for result in self.parsed_file["results"]]
+        students = len(self.parsed_file["students"])
+        inputs = [result["rounds"][round_num] for result in self.parsed_file["students"]]
         categoriesPerStudent = []
+        categor_per_student = defaultdict(int)
 
-        categories = 20
+        categories = self.categorie_amount
         for i in range(students): #for every student
             flag = [False for k in range(categories)] #mark all categories as uncounted
             count = 0 #set counter to zero
@@ -46,10 +48,10 @@ class Analyzer(object):
         return categoriesPerStudent
     
     def countStudentsPerCategory(self, round_num=0):
-        students = len(self.parsed_file["results"])
-        inputs = [result["rounds"][round_num] for result in self.parsed_file["results"]]
+        students = len(self.parsed_file["students"])
+        inputs = [result["rounds"][round_num] for result in self.parsed_file["students"]]
         categoriesPerStudent = []
-        categories = 20
+        categories = self.categorie_amount
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
         for i in range(len(inputs)): # go over every students input
             flag = [False for k in range(categories)] #create a flag to know if a category has been counted as marked by this student
@@ -60,6 +62,9 @@ class Analyzer(object):
                     flag[temp-1] = True #note that you marked the category as "used" by this student
 
         return studentsPerCategory
+
+    def __jaccard_distance(self, v1, v2):
+        return distance.jaccard(v1, v2)
 
     def calculate_all(self):
         results = []
