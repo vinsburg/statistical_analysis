@@ -20,36 +20,54 @@ class Analyzer(object):
         for line in data:
             self.parsed_file["students"].append({
                         "rounds"            : [
-                                [ int(num) for num in line[0:20]  ],
-                                [ int(num) for num in line[20:40] ],
-                                [ int(num) for num in line[40:60] ]
+                                { 
+                                    "inputs" : [ int(num) for num in line[0:20]  ] 
+                                },
+                                { 
+                                    "inputs" : [ int(num) for num in line[20:40] ] 
+                                },
+                                { 
+                                    "inputs" : [ int(num) for num in line[40:60] ] 
+                                }
+                              
                             ],
                         "student_last_name" : line[61],
                         "student_name"      : line[62],
                         "student_id"        : line[63],
                         "student_notes"     : line[60]
                 })
+        self._precalculate_all()
 
-    def countCategoriesPerStudent(self, round_num=0):
-        students = len(self.parsed_file["students"])
-        inputs = [result["rounds"][round_num] for result in self.parsed_file["students"]]
+    def _precalculate_all(self):
+        for round in range(3):
+            self._countCategoriesPerStudent(round)
+
+    def _countCategoriesPerStudent(self, round_num=0):
+        students = (self.parsed_file["students"])
+        inputs = [result["rounds"][round_num]["inputs"] for result in self.parsed_file["students"]]
         categoriesPerStudent = []
-        categor_per_student = defaultdict(int)
 
         categories = self.categorie_amount
-        for i in range(students): #for every student
-            flag = [False for k in range(categories)] #mark all categories as uncounted
-            count = 0 #set counter to zero
-            for temp in inputs[i]: #for every student choice
-                if not flag[(temp)-1]: #if this category hasnt been counted yet:
-                    count+=1 #count the category
-                    flag[(temp)-1] = True #mark the category as counted
+        for student in students: #for every student
+            categories_per_student = defaultdict(int)
+            for categorie in student["rounds"][round_num]["inputs"]:
+                    categories_per_student[categorie] += 1 #add accurance to specific cat count
+            count = len(categories_per_student.keys())
+
+            categoriesPerStudent.append(count) #add the student's count to the object
+            student["rounds"][round_num]["uniq_selected_categories"] = count
+            student["rounds"][round_num]["categorie_selection_count"] = categories_per_student
+
+    def countCategoriesPerStudent(self, round_num=0):
+        categoriesPerStudent = []
+        for student in self.parsed_file["students"]:
+            count = student["rounds"][round_num]["uniq_selected_categories"]
             categoriesPerStudent.append(count) #add the student's count to the object
         return categoriesPerStudent
     
     def countStudentsPerCategory(self, round_num=0):
         students = len(self.parsed_file["students"])
-        inputs = [result["rounds"][round_num] for result in self.parsed_file["students"]]
+        inputs = [result["rounds"][round_num]["inputs"] for result in self.parsed_file["students"]]
         categoriesPerStudent = []
         categories = self.categorie_amount
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
