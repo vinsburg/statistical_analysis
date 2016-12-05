@@ -2,7 +2,8 @@
 
 import csv 
 import scipy.spatial.distance as distance
-from collections import defaultdict
+from collections import OrderedDict
+import itertools
 
 class Analyzer(object):
     
@@ -38,9 +39,30 @@ class Analyzer(object):
                 })
         self._precalculate_all()
 
+    def _get_all_jaccard_distances(self):
+        result = []
+        for student in self.parsed_file["students"]:
+            result.append(student["jdistances"])
+        return result
+
     def _precalculate_all(self):
         for round in range(3):
             self._countCategoriesPerStudent(round)
+        self._calculate_jaccard_distances()
+
+    def _calculate_jaccard_distances(self):
+        for student in self.parsed_file["students"]:
+            selection_vectors = self._get_round_selection_vectors(student) # gets all the round selection vectors
+            combinations = itertools.combinations(selection_vectors, 2)
+            student["jdistances"] = [] 
+            for combination in combinations:
+                student["jdistances"].append(self.__jaccard_distance(combination[0], combination[1]))
+
+    def _get_round_selection_vectors(self, student):
+        # given a student returns all padded selection vecrots
+        # for all his rounds
+        selection_vectors = [a_round["categorie_selection_count"].values() for a_round in student["rounds"]]
+        return selection_vectors
 
     def _countCategoriesPerStudent(self, round_num=0):
         students = (self.parsed_file["students"])
@@ -49,10 +71,15 @@ class Analyzer(object):
 
         categories = self.categorie_amount
         for student in students: #for every student
-            categories_per_student = defaultdict(int)
+            categories_per_student = OrderedDict() 
+            for i in range(1,self.categorie_amount+1):
+                categories_per_student[i] = 0
             for categorie in student["rounds"][round_num]["inputs"]:
-                    categories_per_student[categorie] += 1 #add accurance to specific cat count
-            count = len(categories_per_student.keys())
+                    categories_per_student[int(categorie)] += 1 #add accurance to specific cat count
+            count = 0
+            for k,v in categories_per_student.iteritems():
+                if v != 0:
+                 count += 1
 
             categoriesPerStudent.append(count) #add the student's count to the object
             student["rounds"][round_num]["uniq_selected_categories"] = count
@@ -100,3 +127,4 @@ if __name__ == "__main__":
     analayzer = Analyzer(filename)
     print(analayzer.countCategoriesPerStudent())
     print(analayzer.countStudentsPerCategory())
+    print(analayzer._get_all_jaccard_distances())
