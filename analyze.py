@@ -1,7 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import csv 
 import scipy.spatial.distance as distance
+from scipy.stats import pearsonr 
 from collections import OrderedDict
 import itertools
 import json
@@ -56,10 +57,14 @@ class Analyzer(object):
     def _calculate_jaccard_distances(self):
         for student in self.worksheet["students"]:
             selection_vectors = self._get_round_selection_vectors(student) # gets all the round selection vectors
-            combinations = itertools.combinations(selection_vectors, 2)
+            combinations = itertools.combinations(enumerate(selection_vectors), 2)
             student["jdistances"] = [] 
             for combination in combinations:
-                student["jdistances"].append(self.__jaccard_distance(combination[0], combination[1]))
+                student["jdistances"].append(
+                        { 
+                           "({},{})".format(combination[0][0]+1, combination[1][0]+1) : self.__jaccard_distance(combination[0][1], combination[1][1])
+                        }
+                    )
 
     def _get_round_selection_vectors(self, student):
         # given a student returns all padded selection vecrots
@@ -114,6 +119,10 @@ class Analyzer(object):
     def __jaccard_distance(self, v1, v2):
         return distance.jaccard(v1, v2)
 
+    def _pearson(self, v1, v2):
+        coefficient, pvalue =  pearsonr(v1, v2)
+        return {"coefficient": coefficient, "pvalue": pvalue} 
+
     def calculate_all(self):
         results = []
         for round_num in range(3):
@@ -122,10 +131,19 @@ class Analyzer(object):
                     "students_per_category": self.countStudentsPerCategory()
                 })
         return results
-
-    def _serialize(self):
-        return json.dumps(self.worksheet)
-
+    
+    def _serialize(self, output="csv"):
+        result = {
+                    "json" : self._serialize_json,
+                    "csv" : self._serialize_csv
+                }[output](self.worksheet)
+        return result
+    
+    def _serialize_json(self, data):
+       return json.dumps(data, indent=4)
+   
+    def _serialize_csv(self, data):
+       return json.dumps(data, indent=3) #fixme - make this export csv instead of json
 
 
 if __name__ == "__main__":
@@ -135,3 +153,4 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
+    print(analayzer._pearson([1,2,3],[3,4,9]))
