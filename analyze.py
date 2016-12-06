@@ -154,3 +154,4 @@ if __name__ == "__main__":
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
     print(analayzer._pearson([1,2,3],[3,4,9]))
+    print("who are you")
