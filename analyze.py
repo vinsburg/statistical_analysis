@@ -50,9 +50,38 @@ class Analyzer(object):
         return result
 
     def _precalculate_all(self):
+        self.worksheet["students_per_category"] = []
         for round in range(3):
             self._countCategoriesPerStudent(round)
+            self.worksheet["students_per_category"].append(self.countStudentsPerCategory(round))
         self._calculate_jaccard_distances()
+        self._calculate_google_statistics()
+
+    def _calculate_google_statistics(self):
+        students = self.worksheet["students"]
+        for student in students:
+            for a_round in student["rounds"]:
+                a_round["avg_google_rank"] = self._average_google_rating(a_round["inputs"])
+                a_round["pearson"]         = self._google_pearson(a_round["inputs"])
+                a_round["jdistance"]      = self._google_jaccard(a_round["inputs"])
+   
+    def _average_google_rating(self, inputs):
+        google_value_counters = [0 for i in range(10)]
+        google_value_sums     = [0 for i in range(10)]
+        for index, an_input in enumerate(inputs):
+            an_input -= 1
+            google_value_counters[an_input] += 1
+            google_value_sums[an_input] += index+1
+        google_value_counters = [ 1 if val == 0 else val for val in google_value_counters]
+        return [a for a in map(lambda x,y: x/float(y), google_value_sums, google_value_counters)]
+
+    def _google_pearson(self, inputs):
+        google_ranks = [i for i in range(1,21)]
+        return self.__pearson(google_ranks, inputs)
+
+    def _google_jaccard(self, inputs):
+        google_ranks = [i for i in range(1,21)]
+        return self.__jaccard_distance(google_ranks, inputs)
 
     def _calculate_jaccard_distances(self):
         for student in self.worksheet["students"]:
@@ -119,7 +148,7 @@ class Analyzer(object):
     def __jaccard_distance(self, v1, v2):
         return distance.jaccard(v1, v2)
 
-    def _pearson(self, v1, v2):
+    def __pearson(self, v1, v2):
         coefficient, pvalue =  pearsonr(v1, v2)
         return {"coefficient": coefficient, "pvalue": pvalue} 
 
@@ -153,5 +182,3 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
-    print(analayzer._pearson([1,2,3],[3,4,9]))
-    print("who are you")
