@@ -147,7 +147,7 @@ class Analyzer(object):
 
 
 if __name__ == "__main__":
-    filename = "top3-4judit.xlsx - cloudB.csv"
+    filename = "data/atkinsA.csv"
     analayzer = Analyzer(filename)
     #print(analayzer.countCategoriesPerStudent())
     #print(analayzer.countStudentsPerCategory())
