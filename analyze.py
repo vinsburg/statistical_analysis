@@ -4,22 +4,25 @@ import csv
 import scipy.spatial.distance as distance
 from collections import OrderedDict
 import itertools
+import json
 
 class Analyzer(object):
     
     def __init__(self, filename):
-        self.parsed_file = {"file_name": filename}
+        # lets read all the worksheet exported data
+        self.worksheet = {"file_name": filename}
         data = []
         with open(filename, "r") as csv_file:
             for row in csv.reader(csv_file, dialect='excel'):
                 data.append(row)
+        # pop the titles of the columns , we dont need those, maybe later :)
         header = data.pop(0)
-        self.parsed_file["students"] = []
+        self.worksheet["students"] = []
         # each student gets his own entry
         counter = 0
         self.categorie_amount = 10
         for line in data:
-            self.parsed_file["students"].append({
+            self.worksheet["students"].append({
                         "rounds"            : [
                                 { 
                                     "inputs" : [ int(num) for num in line[0:20]  ] 
@@ -41,7 +44,7 @@ class Analyzer(object):
 
     def _get_all_jaccard_distances(self):
         result = []
-        for student in self.parsed_file["students"]:
+        for student in self.worksheet["students"]:
             result.append(student["jdistances"])
         return result
 
@@ -51,7 +54,7 @@ class Analyzer(object):
         self._calculate_jaccard_distances()
 
     def _calculate_jaccard_distances(self):
-        for student in self.parsed_file["students"]:
+        for student in self.worksheet["students"]:
             selection_vectors = self._get_round_selection_vectors(student) # gets all the round selection vectors
             combinations = itertools.combinations(selection_vectors, 2)
             student["jdistances"] = [] 
@@ -65,8 +68,8 @@ class Analyzer(object):
         return selection_vectors
 
     def _countCategoriesPerStudent(self, round_num=0):
-        students = (self.parsed_file["students"])
-        inputs = [result["rounds"][round_num]["inputs"] for result in self.parsed_file["students"]]
+        students = (self.worksheet["students"])
+        inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
         categoriesPerStudent = []
 
         categories = self.categorie_amount
@@ -87,14 +90,14 @@ class Analyzer(object):
 
     def countCategoriesPerStudent(self, round_num=0):
         categoriesPerStudent = []
-        for student in self.parsed_file["students"]:
+        for student in self.worksheet["students"]:
             count = student["rounds"][round_num]["uniq_selected_categories"]
             categoriesPerStudent.append(count) #add the student's count to the object
         return categoriesPerStudent
     
     def countStudentsPerCategory(self, round_num=0):
-        students = len(self.parsed_file["students"])
-        inputs = [result["rounds"][round_num]["inputs"] for result in self.parsed_file["students"]]
+        students = len(self.worksheet["students"])
+        inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
         categoriesPerStudent = []
         categories = self.categorie_amount
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
@@ -120,11 +123,15 @@ class Analyzer(object):
                 })
         return results
 
+    def _serialize(self):
+        return json.dumps(self.worksheet)
+
 
 
 if __name__ == "__main__":
     filename = "top3-4judit.xlsx - cloudB.csv"
     analayzer = Analyzer(filename)
-    print(analayzer.countCategoriesPerStudent())
-    print(analayzer.countStudentsPerCategory())
-    print(analayzer._get_all_jaccard_distances())
+    #print(analayzer.countCategoriesPerStudent())
+    #print(analayzer.countStudentsPerCategory())
+    #print(analayzer._get_all_jaccard_distances())
+    print(analayzer._serialize())
