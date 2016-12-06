@@ -85,7 +85,7 @@ class Analyzer(object):
             for categorie in student["rounds"][round_num]["inputs"]:
                     categories_per_student[int(categorie)] += 1 #add accurance to specific cat count
             count = 0
-            for k,v in categories_per_student.iteritems():
+            for k,v in categories_per_student.items():
                 if v != 0:
                  count += 1
 
