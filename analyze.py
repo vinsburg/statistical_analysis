@@ -1,3 +1,22 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @vinsburg
+ Watch 0
+  Star 0
+  Fork 1 vinsburg/statistical_analysis
+forked from solebox/statistical_analysis
+ Code  Pull requests 0  Projects 0  Wiki  Pulse  Graphs  Settings
+Branch: vins Find file Copy pathstatistical_analysis/analyze.py
+e8fa866  2 days ago
+@vinsburg vinsburg we are all done just csv method is left lolz
+2 contributors @solebox @vinsburg
+RawBlameHistory     
+Executable File  185 lines (158 sloc)  7.96 KB
+
 #!/usr/bin/env python
 
 import csv 
@@ -21,7 +40,7 @@ class Analyzer(object):
         self.worksheet["students"] = []
         # each student gets his own entry
         counter = 0
-        self.categorie_amount = 10
+        self.category_amount = 10
         for line in data:
             self.worksheet["students"].append({
                         "rounds"            : [
@@ -98,7 +117,7 @@ class Analyzer(object):
     def _get_round_selection_vectors(self, student):
         # given a student returns all padded selection vecrots
         # for all his rounds
-        selection_vectors = [a_round["categorie_selection_count"].values() for a_round in student["rounds"]]
+        selection_vectors = [a_round["category_selection_count"].values() for a_round in student["rounds"]]
         return selection_vectors
 
     def _countCategoriesPerStudent(self, round_num=0):
@@ -106,10 +125,10 @@ class Analyzer(object):
         inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
         categoriesPerStudent = []
 
-        categories = self.categorie_amount
+        categories = self.category_amount
         for student in students: #for every student
             categories_per_student = OrderedDict() 
-            for i in range(1,self.categorie_amount+1):
+            for i in range(1,self.category_amount+1):
                 categories_per_student[i] = 0
             for categorie in student["rounds"][round_num]["inputs"]:
                     categories_per_student[int(categorie)] += 1 #add accurance to specific cat count
@@ -120,7 +139,7 @@ class Analyzer(object):
 
             categoriesPerStudent.append(count) #add the student's count to the object
             student["rounds"][round_num]["uniq_selected_categories"] = count
-            student["rounds"][round_num]["categorie_selection_count"] = categories_per_student
+            student["rounds"][round_num]["category_selection_count"] = categories_per_student
 
     def countCategoriesPerStudent(self, round_num=0):
         categoriesPerStudent = []
@@ -133,7 +152,7 @@ class Analyzer(object):
         students = len(self.worksheet["students"])
         inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
         categoriesPerStudent = []
-        categories = self.categorie_amount
+        categories = self.category_amount
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
         for i in range(len(inputs)): # go over every students input
             flag = [False for k in range(categories)] #create a flag to know if a category has been counted as marked by this student
@@ -172,8 +191,47 @@ class Analyzer(object):
        return json.dumps(data, indent=4)
    
     def _serialize_csv(self, data):
-       return json.dumps(data, indent=3) #fixme - make this export csv instead of json
+        with open('output.csv', 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile, delimiter=',',quotechar=',', quoting=csv.QUOTE_NONE,escapechar="\\")	
+            csvwriter.writerow(['']+['students_per_category'])
+            csvwriter.writerow(['']+['round_1']+['round_2']+['round_3'])
+            SpC = analayzer.worksheet["students_per_category"] #SpC = Students per category
+            categories = analayzer.category_amount
+            for i in range(categories):
+                csvwriter.writerow(['category_'+str(i+1)]+[str(SpC[0][i])]+[str(SpC[1][i])]+[str(SpC[2][i])])
+            h1=['']*7+["round_1"]+['']*43+["round_2"]+['']*43+["round_3"]+['']*43
+            roundstring1 = ['google_result_rating']+['']*19+['selections_per_category']+['']*9+['']+['average_google_category_rank']+['']*12
+            h2=['']*4+["jdistances"]+['']*2+roundstring1*3
+            roundstring2 = [str(i+1) for i in range(20)]+[str(i+1) for i in range(10)]+['jdistance']+[str(i+1) for i in range(10)]+['pearson_pvalue']+['pearson_coefficient']+["number_of_categories_selected"]
+            h3=["student_id"]+["student_last_name"]+["student_name"]+["student_notes"]+['rounds_1&2']+['rounds_1&3']+['rounds_2&3']+roundstring2*3
+            csvwriter.writerow([''])
+            csvwriter.writerow(h1)
+            csvwriter.writerow(h2)
+            csvwriter.writerow(h3)
+            students=analayzer.worksheet["students"]
 
+            for t in students:    
+                line=[]
+                snotes='' #problem stopping snotes from seperating lines
+                #for temp in t['student_notes'].strip().split('\n'): snotes+=temp
+                line+=[str(t['student_id'])]+[str(t['student_last_name'])]+[str(t['student_name'])]+[snotes]
+                temp = t['jdistances']
+                line+=[str(temp[0]['(1,2)'])]+[str(temp[1]['(1,3)'])]+[str(temp[2]['(2,3)'])]
+                for temp in t['rounds']:
+                    for i in temp['inputs']:
+                        line+=[str(i)]
+                    p=temp['category_selection_count']
+                    for i,dic in enumerate(p): #problem reading from p
+                        line+=['']
+#                        line+=[str(p[str(dic)])]
+#                        print(p)
+                    line+=[str(temp['jdistance'])]
+                    for i in temp['avg_google_rank']:
+                        line+=[str(i)]
+                    line+=[str(temp['pearson']['pvalue'])]
+                    line+=[str(temp['pearson']['coefficient'])]
+                    line+=[str(temp['uniq_selected_categories'])]
+                csvwriter.writerow(line)
 
 if __name__ == "__main__":
     filename = "data/atkinsA.csv"
@@ -182,3 +240,5 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
+Contact GitHub API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Status Help
