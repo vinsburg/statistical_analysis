@@ -197,6 +197,7 @@ class Analyzer(object):
             csvwriter.writerow(['']+['round_1']+['round_2']+['round_3'])
             SpC = analayzer.worksheet["students_per_category"] #SpC = Students per category
             categories = analayzer.category_amount
+            
             for i in range(categories):
                 csvwriter.writerow(['category_'+str(i+1)]+[str(SpC[0][i])]+[str(SpC[1][i])]+[str(SpC[2][i])])
             h1=['']*7+["round_1"]+['']*43+["round_2"]+['']*43+["round_3"]+['']*43
@@ -204,6 +205,7 @@ class Analyzer(object):
             h2=['']*4+["jdistances"]+['']*2+roundstring1*3
             roundstring2 = [str(i+1) for i in range(20)]+[str(i+1) for i in range(10)]+['jdistance']+[str(i+1) for i in range(10)]+['pearson_pvalue']+['pearson_coefficient']+["number_of_categories_selected"]
             h3=["student_id"]+["student_last_name"]+["student_name"]+["student_notes"]+['rounds_1&2']+['rounds_1&3']+['rounds_2&3']+roundstring2*3
+            
             csvwriter.writerow([''])
             csvwriter.writerow(h1)
             csvwriter.writerow(h2)
@@ -220,11 +222,9 @@ class Analyzer(object):
                 for temp in t['rounds']:
                     for i in temp['inputs']:
                         line+=[str(i)]
-                    p=temp['category_selection_count']
-                    for i,dic in enumerate(p): #problem reading from p
-                        line+=['']
-#                        line+=[str(p[str(dic)])]
-#                        print(p)
+                    p=list(temp['category_selection_count'].items())
+                    for i in range(len(p)): #problem reading from p
+                        line+=[str(p[i][1])]
                     line+=[str(temp['jdistance'])]
                     for i in temp['avg_google_rank']:
                         line+=[str(i)]
@@ -240,5 +240,7 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
+    #temp = list(analayzer.worksheet['students'][0]['rounds'][0]['category_selection_count'].items())
+
 Contact GitHub API Training Shop Blog About
 © 2016 GitHub, Inc. Terms Privacy Security Status Help
