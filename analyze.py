@@ -89,9 +89,10 @@ class Analyzer(object):
             combinations = itertools.combinations(enumerate(selection_vectors), 2)
             student["jdistances"] = [] 
             for combination in combinations:
+                combo = "({},{})".format(combination[0][0]+1, combination[1][0]+1)
                 student["jdistances"].append(
                         { 
-                           "({},{})".format(combination[0][0]+1, combination[1][0]+1) : self.__jaccard_distance(combination[0][1], combination[1][1])
+                            combo : self.__jaccard_distance(list(combination[0][1]), list(combination[1][1]))
                         }
                     )
 
@@ -137,11 +138,12 @@ class Analyzer(object):
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
         for i in range(len(inputs)): # go over every students input
             flag = [False for k in range(categories)] #create a flag to know if a category has been counted as marked by this student
-            for temp in inputs[i]: # go over the student's individual category inputs
-                if not flag[temp-1]: # if we still havent marked the category in temp as "used" for this student,
+            for an_input in inputs[i]: # go over the student's individual category inputs
+                an_input -= 1
+                if not flag[an_input]: # if we still havent marked the category in temp as "used" for this student,
                                      # use temp-1 because input is 1-10 and indexes are 0-9 
-                    studentsPerCategory[temp-1] += 1 #increment the overall usage count of this category 
-                    flag[temp-1] = True #note that you marked the category as "used" by this student
+                    studentsPerCategory[an_input] += 1 #increment the overall usage count of this category 
+                    flag[an_input] = True #note that you marked the category as "used" by this student
 
         return studentsPerCategory
 
@@ -218,5 +220,5 @@ if __name__ == "__main__":
     #print(analayzer.countCategoriesPerStudent())
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
-    print(analayzer._serialize())
+    print(analayzer._serialize('json'))
 
