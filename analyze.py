@@ -1,23 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Gist
- @vinsburg
- Watch 0
-  Star 0
-  Fork 1 vinsburg/statistical_analysis
-forked from solebox/statistical_analysis
- Code  Pull requests 0  Projects 0  Wiki  Pulse  Graphs  Settings
-Branch: vins Find file Copy pathstatistical_analysis/analyze.py
-e8fa866  2 days ago
-@vinsburg vinsburg we are all done just csv method is left lolz
-2 contributors @solebox @vinsburg
-RawBlameHistory     
-Executable File  185 lines (158 sloc)  7.96 KB
-
-
 #!/usr/bin/env python
 
 import csv 
@@ -240,5 +220,3 @@ if __name__ == "__main__":
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
 
-Contact GitHub API Training Shop Blog About
-© 2016 GitHub, Inc. Terms Privacy Security Status Help
