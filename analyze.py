@@ -195,23 +195,29 @@ class Analyzer(object):
             csvwriter.writerow(h3)
             students=analayzer.worksheet["students"]
 
-            for t in students:    
-                line=[]
-                line+=[str(t['student_id'])]+[str(t['student_last_name'])]+[str(t['student_name'])]+[t['student_notes']]
-                temp = t['jdistances']
-                line+=[str(temp[0]['(1,2)'])]+[str(temp[1]['(1,3)'])]+[str(temp[2]['(2,3)'])]
-                for temp in t['rounds']:
-                    for i in temp['inputs']:
-                        line+=[str(i)]
-                    p=list(temp['category_selection_count'].items())
-                    for i in range(len(p)): #problem reading from p
-                        line+=[str(p[i][1])]
-                    line+=[str(temp['jdistance'])]
-                    for i in temp['avg_google_rank']:
-                        line+=[str(i)]
-                    line+=[str(temp['pearson']['pvalue'])]
-                    line+=[str(temp['pearson']['coefficient'])]
-                    line+=[str(temp['uniq_selected_categories'])]
+            for student in students:    
+                line = list()
+                line += [str(student['student_id'])] + \
+                        [str(student['student_last_name'])]+\
+                        [str(student['student_name'])]+\
+                        [student['student_notes']]
+
+                jdistances = student['jdistances']
+                line += [str(jdistances[0]['(1,2)'])] + \
+                        [str(temp[1]['(1,3)'])] + \
+                        [str(temp[2]['(2,3)'])]
+                for a_round in student['rounds']:
+                    for an_input in a_round['inputs']:
+                        line += [str(an_input)]
+                    category_selection_counts=list(a_round['category_selection_count'].items())
+                    for index in range(len(category_selection_counts)): #problem reading from p
+                        line += [ str(category_selection_counts[index][1]) ]
+                    line += [ str(a_round['jdistance']) ]
+                    for an_avg_google_rank in a_round['avg_google_rank']:
+                        line += [ str(an_avg_google_rank) ]
+                    line += [str(a_round['pearson']['pvalue'])]
+                    line += [str(a_round['pearson']['coefficient'])]
+                    line += [str(a_round['uniq_selected_categories'])]
                 csvwriter.writerow(line)
 
 if __name__ == "__main__":
