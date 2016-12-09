@@ -17,6 +17,7 @@ e8fa866  2 days ago
 RawBlameHistory     
 Executable File  185 lines (158 sloc)  7.96 KB
 
+
 #!/usr/bin/env python
 
 import csv 
@@ -192,7 +193,7 @@ class Analyzer(object):
    
     def _serialize_csv(self, data):
         with open('output.csv', 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, delimiter=',',quotechar=',', quoting=csv.QUOTE_NONE,escapechar="\\")	
+            csvwriter = csv.writer(csvfile, dialect='excel')	
             csvwriter.writerow(['']+['students_per_category'])
             csvwriter.writerow(['']+['round_1']+['round_2']+['round_3'])
             SpC = analayzer.worksheet["students_per_category"] #SpC = Students per category
@@ -214,9 +215,7 @@ class Analyzer(object):
 
             for t in students:    
                 line=[]
-                snotes='' #problem stopping snotes from seperating lines
-                #for temp in t['student_notes'].strip().split('\n'): snotes+=temp
-                line+=[str(t['student_id'])]+[str(t['student_last_name'])]+[str(t['student_name'])]+[snotes]
+                line+=[str(t['student_id'])]+[str(t['student_last_name'])]+[str(t['student_name'])]+[t['student_notes']]
                 temp = t['jdistances']
                 line+=[str(temp[0]['(1,2)'])]+[str(temp[1]['(1,3)'])]+[str(temp[2]['(2,3)'])]
                 for temp in t['rounds']:
@@ -240,7 +239,6 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     print(analayzer._serialize())
-    #temp = list(analayzer.worksheet['students'][0]['rounds'][0]['category_selection_count'].items())
 
 Contact GitHub API Training Shop Blog About
 © 2016 GitHub, Inc. Terms Privacy Security Status Help
