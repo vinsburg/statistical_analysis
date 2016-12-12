@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-
 import csv 
 import scipy.spatial.distance as distance
 from scipy.stats import pearsonr 
 from collections import OrderedDict
 import itertools
 import json
+import sys  
+
 
 class Analyzer(object):
     
@@ -13,7 +14,7 @@ class Analyzer(object):
         # lets read all the worksheet exported data
         self.worksheet = {"file_name": filename}
         data = []
-        with open(filename, "r") as csv_file:
+        with open(filename, "r", encoding='utf-8', errors='ignore') as csv_file:
             for row in csv.reader(csv_file, dialect='excel'):
                 data.append(row)
         # pop the titles of the columns , we dont need those, maybe later :)
@@ -174,7 +175,8 @@ class Analyzer(object):
        return json.dumps(data, indent=4)
    
     def _serialize_csv(self, data):
-        with open('output.csv', 'w', newline='') as csvfile:
+        output_file = self.worksheet['file_name'] + ".csv"
+        with open(output_file, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile, dialect='excel')	
             csvwriter.writerow(['']+['students_per_category'])
             csvwriter.writerow(['']+['round_1']+['round_2']+['round_3'])
@@ -204,8 +206,8 @@ class Analyzer(object):
 
                 jdistances = student['jdistances']
                 line += [str(jdistances[0]['(1,2)'])] + \
-                        [str(temp[1]['(1,3)'])] + \
-                        [str(temp[2]['(2,3)'])]
+                        [str(jdistances[1]['(1,3)'])] + \
+                        [str(jdistances[2]['(2,3)'])]
                 for a_round in student['rounds']:
                     for an_input in a_round['inputs']:
                         line += [str(an_input)]
@@ -221,10 +223,13 @@ class Analyzer(object):
                 csvwriter.writerow(line)
 
 if __name__ == "__main__":
-    filename = "data/atkinsA.csv"
-    analayzer = Analyzer(filename)
+    filenames = sys.argv
+    filenames.pop(0)
+    for filename in filenames:
+        analayzer = Analyzer(filename)
+        analayzer._serialize('csv')
     #print(analayzer.countCategoriesPerStudent())
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
-    print(analayzer._serialize('json'))
+    #print(analayzer._serialize('json'))
 
