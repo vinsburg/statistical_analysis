@@ -5,8 +5,9 @@ from scipy.stats import pearsonr
 from collections import OrderedDict
 import itertools
 import json
-import sys  
-
+import sys
+from csv_printer import make_csv_from_line_matrix, make_csv_line_matrix
+from research_output_data_constructor import students_per_category_line_list_constructor, students_line_list_constructor
 
 class Analyzer(object):
     
@@ -175,52 +176,12 @@ class Analyzer(object):
        return json.dumps(data, indent=4)
    
     def _serialize_csv(self, data):
-        output_file = self.worksheet['file_name'] + ".csv"
-        with open(output_file, 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile, dialect='excel')	
-            csvwriter.writerow(['']+['students_per_category'])
-            csvwriter.writerow(['']+['round_1']+['round_2']+['round_3'])
-            SpC = analayzer.worksheet["students_per_category"] #SpC = Students per category
-            categories = analayzer.category_amount
-            
-            for i in range(categories):
-                csvwriter.writerow(['category_'+str(i+1)]+[str(SpC[0][i])]+[str(SpC[1][i])]+[str(SpC[2][i])])
-            h1=['']*7+["round_1"]+['']*43+["round_2"]+['']*43+["round_3"]+['']*43
-            roundstring1 = ['google_result_rating']+['']*19+['selections_per_category']+['']*9+['']+['average_google_category_rank']+['']*12
-            h2=['']*4+["jdistances"]+['']*2+roundstring1*3
-            roundstring2 = [str(i+1) for i in range(20)]+[str(i+1) for i in range(10)]+['jdistance']+[str(i+1) for i in range(10)]+['pearson_pvalue']+['pearson_coefficient']+["number_of_categories_selected"]
-            h3=["student_id"]+["student_last_name"]+["student_name"]+["student_notes"]+['rounds_1&2']+['rounds_1&3']+['rounds_2&3']+roundstring2*3
-            
-            csvwriter.writerow([''])
-            csvwriter.writerow(h1)
-            csvwriter.writerow(h2)
-            csvwriter.writerow(h3)
-            students=analayzer.worksheet["students"]
-
-            for student in students:    
-                line = list()
-                line += [str(student['student_id'])] + \
-                        [str(student['student_last_name'])]+\
-                        [str(student['student_name'])]+\
-                        [student['student_notes']]
-
-                jdistances = student['jdistances']
-                line += [str(jdistances[0]['(1,2)'])] + \
-                        [str(jdistances[1]['(1,3)'])] + \
-                        [str(jdistances[2]['(2,3)'])]
-                for a_round in student['rounds']:
-                    for an_input in a_round['inputs']:
-                        line += [str(an_input)]
-                    category_selection_counts=list(a_round['category_selection_count'].items())
-                    for index in range(len(category_selection_counts)): #problem reading from p
-                        line += [ str(category_selection_counts[index][1]) ]
-                    line += [ str(a_round['jdistance']) ]
-                    for an_avg_google_rank in a_round['avg_google_rank']:
-                        line += [ str(an_avg_google_rank) ]
-                    line += [str(a_round['pearson']['pvalue'])]
-                    line += [str(a_round['pearson']['coefficient'])]
-                    line += [str(a_round['uniq_selected_categories'])]
-                csvwriter.writerow(line)
+        output_filename = self.worksheet['file_name'] + ".csv"
+        csv_line_list = students_per_category_line_list_constructor(self.worksheet['students_per_category'])
+        csv_line_list += ['\#\#']
+        csv_line_list += students_line_list_constructor(self.worksheet['students'])
+        csv_line_matrix = make_csv_line_matrix(csv_line_list)
+        make_csv_from_line_matrix(csv_line_matrix, output_filename)
 
 if __name__ == "__main__":
     filenames = sys.argv
@@ -232,4 +193,3 @@ if __name__ == "__main__":
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
     #print(analayzer._serialize('json'))
-
