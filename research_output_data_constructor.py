@@ -1,3 +1,5 @@
+
+
 def students_per_category_line_list_constructor(students_per_category_matrix):
 
     """
@@ -26,7 +28,7 @@ def students_per_category_line_list_constructor(students_per_category_matrix):
 
     return return_list
 
-def students_line_list_constructor(students):
+def students_line_list_constructor(worksheet):
     """
     :param: students an object obtained with the syntax <object_name>.worksheet["students"] in analyze.py.
     :return: return_list: list of strings used to construct a 2D array document containing the input matrix.
@@ -36,13 +38,15 @@ def students_line_list_constructor(students):
     #   the newrow_cell variable is used to mark a new row.
     """
     newrow_cell = ['\#\#']
+    students = worksheet['students']
+    google_categories = worksheet['google_categories']
 
     # constructing the table header
     header_row1 = [''] * 7 + ["round_1"] + [''] * 43 + ["round_2"] + [''] * 43 + ["round_3"] + [''] * 43
     roundstring1 = ['google_result_rating'] + [''] * 19 + ['selections_per_category'] + [''] * 9 + [''] + [
         'average_google_category_rank'] + [''] * 12
     header_row2 = [''] * 4 + ["jdistances"] + [''] * 2 + roundstring1 * 3
-    roundstring2 = [str(i + 1) for i in range(20)] + [str(i + 1) for i in range(10)] + ['jdistance'] + [str(i + 1) for i in range(10)] + [
+    roundstring2 = [str(a_cell) for a_cell in google_categories] + [str(i + 1) for i in range(10)] + ['jdistance'] + [str(i + 1) for i in range(10)] + [
                        'pearson_pvalue'] + ['pearson_coefficient'] + ["number_of_categories_selected"]
     header_row3 = ["student_id"] + ["student_last_name"] + ["student_name"] + ["student_notes"] + ['rounds_1&2'] + [
         'rounds_1&3'] + ['rounds_2&3'] + roundstring2 * 3
