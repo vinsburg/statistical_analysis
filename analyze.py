@@ -9,13 +9,14 @@ import sys
 from csv_printer import make_csv_from_line_matrix, make_csv_line_matrix
 from research_output_data_constructor import students_per_category_line_list_constructor, students_line_list_constructor
 
+
 class Analyzer(object):
     
-    def __init__(self, filename):
+    def __init__(self, file_name):
         # lets read all the worksheet exported data
-        self.worksheet = {"file_name": filename}
+        self.worksheet = {"file_name": file_name}
         data = []
-        with open(filename, "r", encoding='utf-8', errors='ignore') as csv_file:
+        with open(file_name, "r", encoding='utf-8', errors='ignore') as csv_file:
             for row in csv.reader(csv_file, dialect='excel'):
                 data.append(row)
         # pop the titles of the columns , we dont need those, maybe later :)
@@ -63,17 +64,20 @@ class Analyzer(object):
         students = self.worksheet["students"]
         for student in students:
             for a_round in student["rounds"]:
-                a_round["avg_google_rank"] = self._average_google_rating(a_round["inputs"])
+                a_round["avg_google_rank"] = self._average_google_rating(a_round["inputs"],90)
                 a_round["pearson"]         = self._google_pearson(a_round["inputs"])
                 a_round["jdistance"]      = self._google_jaccard(a_round["inputs"])
    
-    def _average_google_rating(self, inputs):
+    def _average_google_rating(self, inputs, incrementor):
         google_value_counters = [0 for i in range(10)]
         google_value_sums     = [0 for i in range(10)]
         for index, an_input in enumerate(inputs):
             an_input -= 1
             google_value_counters[an_input] += 1
-            google_value_sums[an_input] += index+1
+            if index <= 10:
+                google_value_sums[an_input] += index+1
+            else:
+                google_value_sums[an_input] += incrementor+index+1
         google_value_counters = [ 1 if val == 0 else val for val in google_value_counters]
         return [a for a in map(lambda x,y: x/float(y), google_value_sums, google_value_counters)]
 
@@ -142,11 +146,10 @@ class Analyzer(object):
             flag = [False for k in range(categories)] #create a flag to know if a category has been counted as marked by this student
             for an_input in inputs[i]: # go over the student's individual category inputs
                 an_input -= 1
-                if not flag[an_input]: # if we still havent marked the category in temp as "used" for this student,
+                if not flag[an_input]: # if we still haven't marked the category in temp as "used" for this student,
                                      # use temp-1 because input is 1-10 and indexes are 0-9 
                     studentsPerCategory[an_input] += 1 #increment the overall usage count of this category 
                     flag[an_input] = True #note that you marked the category as "used" by this student
-
         return studentsPerCategory
 
     def __jaccard_distance(self, v1, v2):
@@ -178,7 +181,7 @@ class Analyzer(object):
     def _serialize_csv(self, data):
         output_filename = self.worksheet['file_name'] + ".csv"
         csv_line_list = students_per_category_line_list_constructor(self.worksheet['students_per_category'])
-        csv_line_list += ['\#\#']
+        csv_line_list += ['\#\#'] #this will indicate the csv_line_matrix method to add a blank line
         csv_line_list += students_line_list_constructor(self.worksheet['students'])
         csv_line_matrix = make_csv_line_matrix(csv_line_list)
         make_csv_from_line_matrix(csv_line_matrix, output_filename)
