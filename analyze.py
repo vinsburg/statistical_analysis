@@ -11,16 +11,18 @@ from research_output_data_constructor import students_per_category_line_list_con
 
 class Analyzer(object):
     
-    def __init__(self, filename):
+    def __init__(self, file_name):
         # lets read all the worksheet exported data
-        self.worksheet = {"file_name": filename}
+        self.worksheet = {"file_name": file_name}
         data = []
-        with open(filename, "r", encoding='utf-8', errors='ignore') as csv_file:
+        # with open(file_name, "r", encoding='utf-8', errors='ignore') as csv_file:
+        with open(file_name, "r", newline='') as csv_file:
             for row in csv.reader(csv_file, dialect='excel'):
                 data.append(row)
-        # pop the titles of the columns , we dont need those, maybe later :)
-        header = data.pop(0)
-        self.worksheet["students"] = []
+        # pop the titles of the columns , we don't need those, maybe later :)
+        self.header = data.pop(0)
+        self.worksheet['google_categories'] = list(map(int,self.header[0:20]))
+        self.worksheet['students'] = []
         # each student gets his own entry
         counter = 0
         self.category_amount = 10
@@ -63,7 +65,7 @@ class Analyzer(object):
         students = self.worksheet["students"]
         for student in students:
             for a_round in student["rounds"]:
-                a_round["avg_google_rank"] = self._average_google_rating(a_round["inputs"])
+                a_round["avg_google_rank"] = self._average_google_rating(a_round["inputs"]) # change to ,100,10) with cloudA&B
                 a_round["pearson"]         = self._google_pearson(a_round["inputs"])
                 a_round["jdistance"]      = self._google_jaccard(a_round["inputs"])
    
@@ -73,17 +75,15 @@ class Analyzer(object):
         for index, an_input in enumerate(inputs):
             an_input -= 1
             google_value_counters[an_input] += 1
-            google_value_sums[an_input] += index+1
+            google_value_sums[an_input] += self.worksheet['google_categories'][index]
         google_value_counters = [ 1 if val == 0 else val for val in google_value_counters]
         return [a for a in map(lambda x,y: x/float(y), google_value_sums, google_value_counters)]
 
     def _google_pearson(self, inputs):
-        google_ranks = [i for i in range(1,21)]
-        return self.__pearson(google_ranks, inputs)
+        return self.__pearson(self.worksheet['google_categories'], inputs)
 
     def _google_jaccard(self, inputs):
-        google_ranks = [i for i in range(1,21)]
-        return self.__jaccard_distance(google_ranks, inputs)
+        return self.__jaccard_distance(self.worksheet['google_categories'], inputs)
 
     def _calculate_jaccard_distances(self):
         for student in self.worksheet["students"]:
@@ -93,13 +93,13 @@ class Analyzer(object):
             for combination in combinations:
                 combo = "({},{})".format(combination[0][0]+1, combination[1][0]+1)
                 student["jdistances"].append(
-                        { 
-                            combo : self.__jaccard_distance(list(combination[0][1]), list(combination[1][1]))
+                        {
+                            combo: self.__jaccard_distance(list(combination[0][1]), list(combination[1][1]))
                         }
                     )
 
     def _get_round_selection_vectors(self, student):
-        # given a student returns all padded selection vecrots
+        # given a student returns all padded selection vectors
         # for all his rounds
         selection_vectors = [a_round["category_selection_count"].values() for a_round in student["rounds"]]
         return selection_vectors
@@ -109,13 +109,13 @@ class Analyzer(object):
         inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
         categoriesPerStudent = []
 
-        categories = self.category_amount
+        # categories = self.category_amount
         for student in students: #for every student
             categories_per_student = OrderedDict() 
-            for i in range(1,self.category_amount+1):
+            for i in range(1, self.category_amount+1):
                 categories_per_student[i] = 0
-            for categorie in student["rounds"][round_num]["inputs"]:
-                    categories_per_student[int(categorie)] += 1 #add accurance to specific cat count
+            for category in student["rounds"][round_num]["inputs"]:
+                    categories_per_student[int(category)] += 1 # add occurrence to specific cat count
             count = 0
             for k,v in categories_per_student.items():
                 if v != 0:
@@ -133,16 +133,16 @@ class Analyzer(object):
         return categoriesPerStudent
     
     def countStudentsPerCategory(self, round_num=0):
-        students = len(self.worksheet["students"])
+        # students = len(self.worksheet["students"])
         inputs = [result["rounds"][round_num]["inputs"] for result in self.worksheet["students"]]
-        categoriesPerStudent = []
+        # categoriesPerStudent = []
         categories = self.category_amount
         studentsPerCategory = [0 for i in range(categories)] #will be updated from file in init
         for i in range(len(inputs)): # go over every students input
             flag = [False for k in range(categories)] #create a flag to know if a category has been counted as marked by this student
             for an_input in inputs[i]: # go over the student's individual category inputs
                 an_input -= 1
-                if not flag[an_input]: # if we still havent marked the category in temp as "used" for this student,
+                if not flag[an_input]: # if we still haven't marked the category in temp as "used" for this student,
                                      # use temp-1 because input is 1-10 and indexes are 0-9 
                     studentsPerCategory[an_input] += 1 #increment the overall usage count of this category 
                     flag[an_input] = True #note that you marked the category as "used" by this student
@@ -188,8 +188,8 @@ class Analyzer(object):
     def _serialize_csv(self, data):
         output_filename = self.worksheet['file_name'] + ".csv"
         csv_line_list = students_per_category_line_list_constructor(self.worksheet['students_per_category'])
-        csv_line_list += ['\#\#']
-        csv_line_list += students_line_list_constructor(self.worksheet['students'])
+        csv_line_list += ['\#\#'] #this will indicate the csv_line_matrix method to add a blank line
+        csv_line_list += students_line_list_constructor(self.worksheet)
         csv_line_matrix = make_csv_line_matrix(csv_line_list)
         make_csv_from_line_matrix(csv_line_matrix, output_filename)
 
