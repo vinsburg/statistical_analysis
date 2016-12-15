@@ -151,11 +151,13 @@ class Analyzer(object):
 
     def __jaccard_distance(self, v1, v2):
         #return distance.jaccard(v1, v2)
-        sum_max_of_vectors = sum(list(map(lambda x, y: max(x, y), v1, v2)))
-        sum_min_of_vectors = sum(list(map(lambda x, y: min(x, y), v1, v2)))
-        sum_min_of_vectors = 1 if sum_min_of_vectors == 0 else sum_min_of_vectors
-        return sum_max_of_vectors/float(sum_min_of_vectors)
-    def testing_jacc(self, v1, v2):
+        if len(v1) != len(v2):
+            raise ValueError
+        intersection = sum(list(map(lambda x, y: int( x == y ), v1, v2)))
+        union = len(v1) + len(v2) - intersection
+        return 1 - intersection/float(union)
+
+    def testing_jacc(self):
         v1 = [1, 2, 5, 3, 5, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 3, 5, 5]
         v2 = [1, 3, 2, 3, 1, 3, 2, 1, 4, 1, 1, 1, 1, 1, 4, 1, 3, 2, 1, 1]
         print(v1)
@@ -197,9 +199,9 @@ if __name__ == "__main__":
     filenames = sys.argv
     filenames.pop(0)
     for filename in filenames:
-        analayzer = Analyzer(filename)
-        analayzer.testing_jacc()
-    #print(analayzer.countCategoriesPerStudent())
-    #print(analayzer.countStudentsPerCategory())
-    #print(analayzer._get_all_jaccard_distances())
-    #print(analayzer._serialize('json'))
+        analyzer = Analyzer(filename)
+        print(analyzer._serialize('csv'))
+    #print(analyzer.countCategoriesPerStudent())
+    #print(analyzer.countStudentsPerCategory())
+    #print(analyzer._get_all_jaccard_distances())
+    # print(analyzer._serialize('json'))
