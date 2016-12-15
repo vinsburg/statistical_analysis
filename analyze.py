@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-import csv 
-import scipy.spatial.distance as distance
-from scipy.stats import pearsonr 
-from collections import OrderedDict
 import itertools
 import json
 import sys
-from csv_printer import make_csv_from_line_matrix, make_csv_line_matrix
-from research_output_data_constructor import students_per_category_line_list_constructor, students_line_list_constructor
+import os
+from collections import OrderedDict
+from scipy.stats import pearsonr
+
+
+
+from lib.csv_printer import *
+from lib.research_output_data_constructor import *
 
 class Analyzer(object):
     
@@ -188,7 +190,9 @@ class Analyzer(object):
        return json.dumps(data, indent=4)
    
     def _serialize_csv(self, data):
-        output_filename = self.worksheet['file_name'] + ".csv"
+        output_dirname, output_filename = os.path.split(self.worksheet['file_name'])
+        output_filename = "/".join([output_dirname,"outputs", output_filename])
+        print(output_filename)
         csv_line_list = students_per_category_line_list_constructor(self.worksheet['students_per_category'])
         csv_line_list += ['\#\#'] #this will indicate the csv_line_matrix method to add a blank line
         csv_line_list += students_line_list_constructor(self.worksheet)
@@ -200,7 +204,7 @@ if __name__ == "__main__":
     filenames.pop(0)
     for filename in filenames:
         analyzer = Analyzer(filename)
-        print(analyzer._serialize('csv'))
+        analyzer._serialize('csv')
     #print(analyzer.countCategoriesPerStudent())
     #print(analyzer.countStudentsPerCategory())
     #print(analyzer._get_all_jaccard_distances())
