@@ -155,6 +155,12 @@ class Analyzer(object):
         sum_min_of_vectors = sum(list(map(lambda x, y: min(x, y), v1, v2)))
         sum_min_of_vectors = 1 if sum_min_of_vectors == 0 else sum_min_of_vectors
         return sum_max_of_vectors/float(sum_min_of_vectors)
+    def testing_jacc(self, v1, v2):
+        v1 = [1, 2, 5, 3, 5, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 3, 5, 5]
+        v2 = [1, 3, 2, 3, 1, 3, 2, 1, 4, 1, 1, 1, 1, 1, 4, 1, 3, 2, 1, 1]
+        print(v1)
+        print(v2)
+        print(self.__jaccard_distance(v1,v2))
 
     def __pearson(self, v1, v2):
         coefficient, pvalue =  pearsonr(v1, v2)
@@ -192,7 +198,7 @@ if __name__ == "__main__":
     filenames.pop(0)
     for filename in filenames:
         analayzer = Analyzer(filename)
-        analayzer._serialize('csv')
+        analayzer.testing_jacc()
     #print(analayzer.countCategoriesPerStudent())
     #print(analayzer.countStudentsPerCategory())
     #print(analayzer._get_all_jaccard_distances())
