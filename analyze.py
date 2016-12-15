@@ -150,7 +150,11 @@ class Analyzer(object):
         return studentsPerCategory
 
     def __jaccard_distance(self, v1, v2):
-        return distance.jaccard(v1, v2)
+        #return distance.jaccard(v1, v2)
+        sum_max_of_vectors = sum(list(map(lambda x, y: max(x, y), v1, v2)))
+        sum_min_of_vectors = sum(list(map(lambda x, y: min(x, y), v1, v2)))
+        sum_min_of_vectors = 1 if sum_min_of_vectors == 0 else sum_min_of_vectors
+        return sum_max_of_vectors/float(sum_min_of_vectors)
 
     def __pearson(self, v1, v2):
         coefficient, pvalue =  pearsonr(v1, v2)
