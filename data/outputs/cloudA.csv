@@ -3,10 +3,17 @@
 category_1,22,22,22
 category_2,22,22,22
 category_3,21,22,21
+category_4,19,11,13
+category_5,8,6,6
+category_6,2,2,1
+category_7,2,0,0
+category_8,1,0,0
+category_9,1,0,0
+category_10,0,0,0
 
 ,,,,,,,round_1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,round_2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,round_3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,jdistances,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,
-student_id,student_last_name,student_name,student_notes,rounds_1&2,rounds_1&3,rounds_2&3,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected
+,,,,jdistances_vs_self_in_3_rounds,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,
+student_id,student_last_name,student_name,student_notes,rounds_1&2,rounds_1&3,rounds_2&3,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance_vs_google,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance_vs_google,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected,1,2,3,4,5,6,7,8,9,10,101,102,103,104,105,106,107,108,109,110,1,2,3,4,5,6,7,8,9,10,jdistance_vs_google,1,2,3,4,5,6,7,8,9,10,pearson_pvalue,pearson_coefficient,number_of_categories_selected
 16447906,ארדיטי בבצ'וק,הדר,"דף 1 - ויקיפדיה
 דף 4 - וובופדיה
 דף 20 - dictionary.com

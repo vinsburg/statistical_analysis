@@ -3,6 +3,13 @@
 category_1,24,24,24
 category_2,24,24,24
 category_3,24,23,23
+category_4,20,17,17
+category_5,15,9,10
+category_6,9,5,4
+category_7,6,2,2
+category_8,1,1,1
+category_9,0,0,0
+category_10,1,0,0
 
 ,,,,,,,round_1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,round_2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,round_3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,jdistances_vs_self_in_3_rounds,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,,google_result_rating,,,,,,,,,,,,,,,,,,,,selections_per_category,,,,,,,,,,,average_google_category_rank,,,,,,,,,,,,

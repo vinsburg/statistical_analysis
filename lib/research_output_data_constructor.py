@@ -18,7 +18,7 @@ def students_per_category_line_list_constructor(students_per_category_matrix):
     return_list += [''] + ['round_1'] + ['round_2'] + ['round_3'] + newrow_cell
 
     # constructing the row headers and inserting the values in students_per_category_matrix
-    categories = len(students_per_category_matrix)
+    categories = len(students_per_category_matrix[0])
     for category_index in range(categories):
         return_list += ['category_' + str(category_index + 1)]  # indexed
         return_list += [str(students_per_category_matrix[0][category_index])]
