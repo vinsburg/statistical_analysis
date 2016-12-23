@@ -93,6 +93,11 @@ class Analyzer(object):
             student["jdistances"] = []
             for combination in combinations:
                 combo = "({},{})".format(combination[0][0]+1, combination[1][0]+1)
+                print(student['student_id'])
+                # print(list(combination[0][1]))
+                # print(list(combination[1][1]))
+                # print(self.__jaccard_distance(list(combination[0][1]), list(combination[1][1])))
+                # print()
                 student["jdistances"].append(
                         {
                             combo: self.__jaccard_distance(list(combination[0][1]), list(combination[1][1]))
