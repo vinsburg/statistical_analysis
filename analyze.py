@@ -94,10 +94,10 @@ class Analyzer(object):
             for combination in combinations:
                 combo = "({},{})".format(combination[0][0]+1, combination[1][0]+1)
                 print(student['student_id'])
-                # print(list(combination[0][1]))
-                # print(list(combination[1][1]))
-                # print(self.__jaccard_distance(list(combination[0][1]), list(combination[1][1])))
-                # print()
+                print(list(combination[0][1]))
+                print(list(combination[1][1]))
+                print(self.__jaccard_distance(list(combination[0][1]), list(combination[1][1])))
+                print()
                 student["jdistances"].append(
                         {
                             combo: self.__jaccard_distance(list(combination[0][1]), list(combination[1][1]))
@@ -107,7 +107,7 @@ class Analyzer(object):
     def _get_round_selection_vectors(self, student):
         # given a student returns all padded selection vectors
         # for all his rounds
-        selection_vectors = [a_round["category_selection_count"].values() for a_round in student["rounds"]]
+        selection_vectors = [a_round["inputs"] for a_round in student["rounds"]]
         return selection_vectors
 
     def _count_categories_per_student(self, round_num=0):
