@@ -59,6 +59,7 @@ class Analyzer(object):
         for a_round in range(3):
             self._count_categories_per_student(a_round)
             self.worksheet["students_per_category"].append(self.count_students_per_category(a_round))
+        self._calculate_selection_jaccard_distances()
         self._calculate_jaccard_distances()
         self._calculate_google_statistics()
 
@@ -88,7 +89,7 @@ class Analyzer(object):
 
     def _calculate_jaccard_distances(self):
         for student in self.worksheet["students"]:
-            selection_vectors = self._get_round_selection_vectors(student)  # gets all the round selection vectors
+            selection_vectors = self._get_round_input_vectors(student)  # gets all the round selection vectors
             combinations = itertools.combinations(enumerate(selection_vectors), 2)
             student["jdistances"] = []
             for combination in combinations:
@@ -104,10 +105,34 @@ class Analyzer(object):
                         }
                     )
 
-    def _get_round_selection_vectors(self, student):
+    def _get_round_input_vectors(self, student):
         # given a student returns all padded selection vectors
         # for all his rounds
         selection_vectors = [a_round["inputs"] for a_round in student["rounds"]]
+        return selection_vectors
+
+    def _calculate_selection_jaccard_distances(self):
+        for student in self.worksheet["students"]:
+            selection_vectors = self._get_round_selection_vectors(student)  # gets all the round selection vectors
+            combinations = itertools.combinations(enumerate(selection_vectors), 2)
+            student["selection_jdistances"] = []
+            for combination in combinations:
+                combo = "({},{})".format(combination[0][0]+1, combination[1][0]+1)
+                # print(student['student_id'])
+                # print(list(combination[0][1]))
+                # print(list(combination[1][1]))
+                # print(self.__weighted_jaccard_distance(list(combination[0][1]), list(combination[1][1])))
+                # print()
+                student["selection_jdistances"].append(
+                        {
+                            combo: self.__weighted_jaccard_distance(list(combination[0][1]), list(combination[1][1]))
+                        }
+                    )
+
+    def _get_round_selection_vectors(self, student):
+        # given a student returns all padded selection vectors
+        # for all his rounds
+        selection_vectors = [a_round["category_selection_count"].values() for a_round in student["rounds"]]
         return selection_vectors
 
     def _count_categories_per_student(self, round_num=0):
@@ -163,6 +188,14 @@ class Analyzer(object):
         union = len(v1) + len(v2) - intersection
         return 1-intersection/float(union)
 
+    def __weighted_jaccard_distance(self, v1, v2):
+        # return distance.jaccard(v1, v2)
+        if len(v1) != len(v2):
+            raise ValueError
+        intersection = sum(list(map(lambda x, y: min(x,y), v1, v2)))
+        union = sum(list(map(lambda x, y: max(x,y), v1, v2)))
+        return 1-intersection/float(union)
+
     def testing_jacc(self):
         # v1 = [1, 2, 5, 3, 5, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 3, 5, 5]
         # v2 = [1, 3, 2, 3, 1, 3, 2, 1, 4, 1, 1, 1, 1, 1, 4, 1, 3, 2, 1, 1]
@@ -212,7 +245,8 @@ if __name__ == "__main__":
     for filename in filenames:
         analyzer = Analyzer(filename)
         analyzer._serialize('csv')
+        # print(analyzer._serialize('json'))
     # print(analyzer.count_categories_per_student())
     # print(analyzer.count_students_per_category())
     # print(analyzer._get_all_jaccard_distances())
-    # print(analyzer._serialize('json'))
+
